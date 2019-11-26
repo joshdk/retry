@@ -27,7 +27,7 @@ type Spec struct {
 	Attempts int
 
 	// Backoff is for enabling exponential backoff between task invocations.
-	// The time between tasks will double each ti,e there is a failure, but
+	// The time between tasks will double each time there is a failure, but
 	// will reset if there is a subsequent success.
 	Backoff bool
 
@@ -50,27 +50,22 @@ type Spec struct {
 // Retry will repeatedly run the given task, until it is successful. The given
 // spec is used for determining what exactly is considered "successful", and
 // how to handle timing of the potentially multiple task invocations.
-//
-// - The task should be idempotent, as it may be invoked repeatedly.
-// - The task should be tolerant of being stopped, as it may be aborted early
-//   if it, for example, takes too long.
 func Retry(spec Spec, task Task) error {
 	ctxBackground := context.Background()
 	ctxMaxTime, cancel := maybeTimed(ctxBackground, spec.TotalTime)
 	defer cancel()
 
-	errch := make(chan error, 1)
+	var totalRuns int
+	var multiplier int64 = 1
+	var consecutive int
+	for {
+		ctxMaxTask, _ := maybeTimed(ctxMaxTime, spec.TaskTime)
 
-	go func() {
-		var totalRuns int
-		var multiplier int64 = 1
-		var consecutive int
-
-		for {
-			ctxMaxTask, _ := maybeTimed(ctxMaxTime, spec.TaskTime)
-
-			// Run the given task, and record if it succeeded or failed.
-			if err := task.Run(ctxMaxTask); err != nil {
+		select {
+		case <-ctxMaxTime.Done():
+			return ErrExceededTime
+		case err := <-runnerChan(ctxMaxTask, task):
+			if err != nil {
 				// Task failed, so drop the number of consecutive successful
 				// runs back down to zero.
 				consecutive = 0
@@ -83,21 +78,21 @@ func Retry(spec Spec, task Task) error {
 
 			// The desired number of consecutive successful runs was hit.
 			// Return successfully.
-			if consecutive >= spec.Consecutive {
-				errch <- nil
-				return
+			if  consecutive >= max(spec.Consecutive, 1) {
+				return nil
 			}
 
 			// The maximum number of runs was exceeded. Return with a "maximum
 			// attempts exceeded" failure.
 			if spec.Attempts != 0 && totalRuns >= spec.Attempts {
-				errch <- ErrExceededAttempts
-				return
+				return ErrExceededAttempts
 			}
 
 			// Sleep for the specified duration.
 			snooze := spec.Sleep * time.Duration(multiplier)
-			time.Sleep(snooze)
+			if err := contextSleep(ctxMaxTime, snooze); err != nil {
+				return ErrExceededTime
+			}
 
 			// Effectively double the sleep time, if (exponential) backoff was
 			// specified.
@@ -105,16 +100,14 @@ func Retry(spec Spec, task Task) error {
 				multiplier *= 2
 			}
 		}
-	}()
-
-	// Wait until there was either a (potentially nil) error, or we ran out of
-	// time.
-	select {
-	case <-ctxMaxTime.Done():
-		return ErrExceededTime
-	case err := <-errch:
-		return err
 	}
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func maybeTimed(parent context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
@@ -122,4 +115,39 @@ func maybeTimed(parent context.Context, timeout time.Duration) (context.Context,
 		return context.WithCancel(parent)
 	}
 	return context.WithTimeout(parent, timeout)
+}
+
+// contextSleep is a context-aware sleep. It will sleep for the given timeout,
+// but will return early if the given context is cancelled. The return value
+// will be nil after a full sleep, and non-nil if the given context was
+// cancelled.
+func contextSleep(ctx context.Context, timeout time.Duration) error {
+	sleepCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	// Wait for either context to be done. Despite the child context being
+	// derived from the parent, and how context cancellation is propagated, we
+	// still cannot be sure which context was expired when selecting on both
+	// in this way. This is why ctx.Err() is returned in both cases.
+	select {
+	case <-ctx.Done():
+		// The parent context is done, so return its error reason.
+		return ctx.Err()
+	case <-sleepCtx.Done():
+		// The child, parent, or both contexts are done, so return the parent
+		// error reason if any. Will return nil if the child context expired
+		// and the parent context was still active.
+		return ctx.Err()
+	}
+}
+
+// runnerChan runs the given task, and returns a channel that will report that
+// task's return value.
+func runnerChan(ctx context.Context, task Task) <- chan error {
+	errch := make(chan error, 1)
+	go func() {
+		defer close(errch)
+		errch <- task.Run(ctx)
+	}()
+	return errch
 }
