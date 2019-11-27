@@ -17,7 +17,7 @@ var (
 
 	// ErrExceededTime is an error that is returned for a task that ran too
 	// long, without being successful.
-	ErrExceededTime     = errors.New("maximum time exceeded")
+	ErrExceededTime = errors.New("maximum time exceeded")
 )
 
 // Spec represents the various behavior parameters for retrying a task.
@@ -78,7 +78,7 @@ func Retry(spec Spec, task Task) error {
 
 			// The desired number of consecutive successful runs was hit.
 			// Return successfully.
-			if  consecutive >= max(spec.Consecutive, 1) {
+			if consecutive >= max(spec.Consecutive, 1) {
 				return nil
 			}
 
@@ -143,7 +143,7 @@ func contextSleep(ctx context.Context, timeout time.Duration) error {
 
 // runnerChan runs the given task, and returns a channel that will report that
 // task's return value.
-func runnerChan(ctx context.Context, task Task) <- chan error {
+func runnerChan(ctx context.Context, task Task) <-chan error {
 	errch := make(chan error, 1)
 	go func() {
 		defer close(errch)
