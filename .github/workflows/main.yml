@@ -1,5 +1,13 @@
-name: build
-on: push
+name: Build
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - "master"
+    tags:
+      - "!*"
 
 jobs:
   build:
