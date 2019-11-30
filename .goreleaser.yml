@@ -1,0 +1,43 @@
+project_name: retry
+
+builds:
+  - id: retry
+    binary: retry
+
+    goos:
+      - darwin
+      - windows
+      - linux
+
+    goarch:
+      - amd64
+      - 386
+
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+
+    env:
+      - CGO_ENABLED=0
+
+    hooks:
+      pre: go mod tidy
+      post: ./upx.sh
+
+archives:
+  - id: retry
+    builds: [retry]
+    name_template: "{{.ProjectName}}-{{.Os}}-{{.Arch}}"
+
+    format_overrides:
+      - goos: windows
+        format: zip
+
+release:
+  name_template: "{{.Version}} Release"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  skip: true
