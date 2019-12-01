@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/joshdk/retry/retry"
@@ -48,7 +49,20 @@ func mainCmd() error {
 		return errors.New("no command given")
 	}
 
-	task := retry.NewExecTask(flag.Args()[0], flag.Args()[1:]...)
+	var (
+		task    retry.Task
+		command = flag.Args()[0]
+		args    = flag.Args()[1:]
+	)
+
+	if strings.HasPrefix(command, "http://") || strings.HasPrefix(command, "https://") {
+		// The command looks like it references a url (starts with http:// or
+		// https://).
+		task = retry.NewHTTPTask(command)
+	} else {
+		// Otherwise, assume the command references a (shell) command.
+		task = retry.NewExecTask(command, args...)
+	}
 
 	return retry.Retry(spec, task)
 }
