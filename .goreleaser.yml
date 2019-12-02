@@ -35,6 +35,7 @@ archives:
 
 release:
   name_template: "{{.Version}} Release"
+  prerelease: auto
 
 checksum:
   name_template: "checksums.txt"
