@@ -29,6 +29,17 @@ jobs:
       - name: Sanity check version
         run: ./dist/retry -version
 
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Run tests
+        run: go test -v -race -cover ./...
+
   golang-ci-lint:
     name: Lint
     runs-on: ubuntu-latest
