@@ -20,19 +20,24 @@ import (
 var version = "development"
 
 func main() {
-	if err := mainCmd(); err != nil {
+	failed, err := mainCmd()
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "retry: %v\n", err)
+	}
+	if failed {
 		os.Exit(1)
 	}
 }
 
-func mainCmd() error {
+func mainCmd() (bool, error) {
 	var spec retry.Spec
 	var versionFlag bool
+	var quietFlag bool
 	flag.IntVar(&spec.Attempts, "attempts", 3, "maximum number of attempts")
 	flag.BoolVar(&spec.Backoff, "backoff", false, "use exponential backoff when sleeping")
 	flag.IntVar(&spec.Consecutive, "consecutive", 0, "required number of back to back successes")
 	flag.DurationVar(&spec.TotalTime, "max-time", time.Minute, "maximum total time")
+	flag.BoolVar(&quietFlag, "quiet", false, "silence all output")
 	flag.DurationVar(&spec.Sleep, "sleep", 5*time.Second, "time to sleep between attempts")
 	flag.DurationVar(&spec.TaskTime, "task-time", 0, "maximum time for a single attempt")
 	flag.BoolVar(&versionFlag, "version", false, fmt.Sprintf("print the version %q and exit", version))
@@ -41,12 +46,12 @@ func mainCmd() error {
 	// If the version flag (-version) was given, print the version and exit.
 	if versionFlag {
 		fmt.Println(version)
-		return nil
+		return false, nil
 	}
 
 	// If no arguments were given, there's nothing to do.
 	if flag.NArg() == 0 {
-		return errors.New("no command given")
+		return true, errors.New("no command given")
 	}
 
 	var (
@@ -58,11 +63,19 @@ func mainCmd() error {
 	if strings.HasPrefix(command, "http://") || strings.HasPrefix(command, "https://") {
 		// The command looks like it references a url (starts with http:// or
 		// https://).
-		task = retry.NewHTTPTask(command)
+		task = retry.HTTPTask{URL: command}
 	} else {
 		// Otherwise, assume the command references a (shell) command.
-		task = retry.NewExecTask(command, args...)
+		task = retry.ExecTask{Name: command, Args: args, Quiet: quietFlag}
 	}
 
-	return retry.Retry(spec, task)
+	err := retry.Retry(spec, task)
+	switch {
+	case err != nil && quietFlag:
+		return true, nil // Intentionally silence error.
+	case err != nil:
+		return true, err
+	default:
+		return false, nil
+	}
 }

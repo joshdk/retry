@@ -17,36 +17,31 @@ type Task interface {
 }
 
 var (
-	_ Task = (*execTask)(nil)
-	_ Task = (*httpTask)(nil)
+	_ Task = (*ExecTask)(nil)
+	_ Task = (*HTTPTask)(nil)
 )
 
-func NewExecTask(name string, args ...string) Task {
-	return &execTask{name, args}
+type ExecTask struct {
+	Name  string
+	Args  []string
+	Quiet bool
 }
 
-type execTask struct {
-	name string
-	args []string
-}
-
-func (t execTask) Run(ctx context.Context) error {
-	cmd := exec.CommandContext(ctx, t.name, t.args...)
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
+func (t ExecTask) Run(ctx context.Context) error {
+	cmd := exec.CommandContext(ctx, t.Name, t.Args...)
+	if !t.Quiet {
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+	}
 	return cmd.Run()
 }
 
-func NewHTTPTask(url string) Task {
-	return &httpTask{url}
+type HTTPTask struct {
+	URL string
 }
 
-type httpTask struct {
-	url string
-}
-
-func (t httpTask) Run(ctx context.Context) error {
-	request, err := http.NewRequest("GET", t.url, nil)
+func (t HTTPTask) Run(ctx context.Context) error {
+	request, err := http.NewRequest("GET", t.URL, nil)
 	if err != nil {
 		return err
 	}
