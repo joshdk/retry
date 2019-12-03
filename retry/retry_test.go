@@ -21,7 +21,7 @@ func TestRetry(t *testing.T) {
 	}{
 		{
 			title: "succeed fast",
-			task:  NewExecTask("true"),
+			task:  ExecTask{Name: "true"},
 			spec: Spec{
 				Attempts: 3,
 			},
@@ -33,7 +33,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "fail fast",
-			task:  NewExecTask("false"),
+			task:  ExecTask{Name: "false"},
 			spec: Spec{
 				Attempts: 3,
 			},
@@ -47,7 +47,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "succeed slow with task time",
-			task:  NewExecTask("sleep", "2"),
+			task:  ExecTask{Name: "sleep", Args: []string{"2"}},
 			spec: Spec{
 				Attempts: 3,
 				TaskTime: 3 * time.Second,
@@ -60,7 +60,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "succeed slow consecutively with task time",
-			task:  NewExecTask("sleep", "2"),
+			task:  ExecTask{Name: "sleep", Args: []string{"2"}},
 			spec: Spec{
 				Attempts:    3,
 				TaskTime:    3 * time.Second,
@@ -76,7 +76,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "fail slow with task time",
-			task:  NewExecTask("sleep", "600"),
+			task:  ExecTask{Name: "sleep", Args: []string{"600"}},
 			spec: Spec{
 				Attempts: 3,
 				TaskTime: 3 * time.Second,
@@ -91,7 +91,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "fail slow with task time and sleep",
-			task:  NewExecTask("sleep", "600"),
+			task:  ExecTask{Name: "sleep", Args: []string{"600"}},
 			spec: Spec{
 				Attempts: 3,
 				TaskTime: 3 * time.Second,
@@ -107,7 +107,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "fail slow with task time, sleep, and backoff",
-			task:  NewExecTask("sleep", "600"),
+			task:  ExecTask{Name: "sleep", Args: []string{"600"}},
 			spec: Spec{
 				Attempts: 3,
 				TaskTime: 3 * time.Second,
@@ -124,7 +124,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "fail slow with task time, sleep, backoff, and total time",
-			task:  NewExecTask("sleep", "600"),
+			task:  ExecTask{Name: "sleep", Args: []string{"600"}},
 			spec: Spec{
 				Attempts:  3,
 				TaskTime:  3 * time.Second,
@@ -141,7 +141,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "http url",
-			task:  NewHTTPTask("http://www.google.com"),
+			task:  HTTPTask{"http://www.google.com"},
 			spec: Spec{
 				Attempts: 1,
 			},
@@ -153,7 +153,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "https url",
-			task:  NewHTTPTask("https://www.google.com"),
+			task:  HTTPTask{"https://www.google.com"},
 			spec: Spec{
 				Attempts: 1,
 			},
@@ -165,7 +165,7 @@ func TestRetry(t *testing.T) {
 		},
 		{
 			title: "bad url",
-			task:  NewHTTPTask("https://fake.example.com"),
+			task:  HTTPTask{"https://fake.example.com"},
 			spec: Spec{
 				Attempts: 1,
 			},
