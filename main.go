@@ -41,6 +41,7 @@ func mainCmd() (bool, error) {
 	flag.DurationVar(&spec.Sleep, "sleep", 5*time.Second, "time to sleep between attempts")
 	flag.DurationVar(&spec.TaskTime, "task-time", 0, "maximum time for a single attempt")
 	flag.BoolVar(&versionFlag, "version", false, fmt.Sprintf("print the version %q and exit", version))
+	flag.Usage = usage
 	flag.Parse()
 
 	// If the version flag (-version) was given, print the version and exit.
@@ -78,4 +79,9 @@ func mainCmd() (bool, error) {
 	default:
 		return false, nil
 	}
+}
+
+func usage() {
+	fmt.Fprintf(flag.CommandLine.Output(), "Usage: retry [flags] command|url\n")
+	flag.PrintDefaults()
 }
