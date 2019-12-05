@@ -1,4 +1,8 @@
+[![Actions][github-actions-badge]][github-actions-link]
 [![License][license-badge]][license-link]
+[![Go Report Card][go-report-card-badge]][go-report-card-link]
+[![Godoc][godoc-badge]][godoc-link]
+[![Releases][github-release-badge]][github-release-link]
 
 # Retry
 
@@ -8,7 +12,7 @@
 
 ### Release binary
 
-A prebuilt [release](https://github.com/joshdk/retry/releases) binary can be downloaded by running:
+A prebuilt [release][github-release-link] binary can be downloaded by running:
 
 ```bash
 $ wget -q https://github.com/joshdk/retry/releases/download/v1.0.0/retry-linux-amd64.tar.gz
@@ -36,7 +40,7 @@ Searching around, this doesn't seem to be an isolated problem, which has an even
 
 These are perfectly legitimate questions, with many reasonable answers. The downside is that the solutions were usually specific to the question asked, and not always applicable to the broader problem.
 
-This tool is an attempt to solve this broader problem. ⏰
+This tool is an attempt to solve that broader problem. ⏰
 
 ## Usage
 
@@ -44,7 +48,7 @@ This tool is an attempt to solve this broader problem. ⏰
 
 ```bash
 $ retry -help
-Usage of retry:
+Usage: retry [flags] command|url
   -attempts int
     	maximum number of attempts (default 3)
   -backoff
@@ -71,7 +75,7 @@ As a special case, if a URL is given, retry will GET that URL and check for a 20
 
 ### Limit attempts
 
-The `-attempts` flag limits the maximum number of times a command can be run.
+The `-attempts` flag limits the maximum number of times a command can be run. A value of 0 allows unlimited attempts.
 
 > Run `cat kubeconfig.yml` a maximum of 3 times, or less if the command succeeds earlier:
 >
@@ -81,7 +85,7 @@ The `-attempts` flag limits the maximum number of times a command can be run.
 
 ### Limit task time
 
-The `-task-time` flag limits the maximum time that a command can run for. 
+The `-task-time` flag limits the maximum time that a command can run for. A value of 0 allows unlimited time.
 
 > Run `wget https://example.com`, but limit the command to only run for a maximum of 15 seconds.
 >
@@ -91,7 +95,7 @@ The `-task-time` flag limits the maximum time that a command can run for.
 
 ### Limit overall time
 
-The `-max-time` flag limits the maximum total time that `retry` will run for.
+The `-max-time` flag limits the maximum total time that `retry` will run for. A value of 0 allows unlimited time.
 
 > GET `https://example.com` repeatedly, but stop running after a total of 60 seconds.
 >
@@ -151,6 +155,14 @@ Lastly, the `-quiet` flag silences all output (STDOUT and STDERR) from the comma
 
 This code is distributed under the [MIT License][license-link], see [LICENSE.txt][license-file] for more information.
 
-[license-badge]:    https://img.shields.io/badge/license-MIT-green.svg
-[license-file]:     https://github.com/joshdk/retry/blob/master/LICENSE.txt
-[license-link]:     https://opensource.org/licenses/MIT
+[github-actions-badge]:  https://github.com/joshdk/retry/workflows/build/badge.svg
+[github-actions-link]:   https://github.com/joshdk/retry/actions
+[github-release-badge]:  https://img.shields.io/github/release/joshdk/retry/all.svg
+[github-release-link]:   https://github.com/joshdk/retry/releases
+[go-report-card-badge]:  https://goreportcard.com/badge/github.com/joshdk/retry
+[go-report-card-link]:   https://goreportcard.com/report/github.com/joshdk/retry
+[godoc-badge]:           https://godoc.org/github.com/joshdk/retry/retry?status.svg
+[godoc-link]:            https://godoc.org/github.com/joshdk/retry/retry
+[license-badge]:         https://img.shields.io/badge/license-MIT-green.svg
+[license-file]:          https://github.com/joshdk/retry/blob/master/LICENSE.txt
+[license-link]:          https://opensource.org/licenses/MIT
