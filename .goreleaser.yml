@@ -22,7 +22,7 @@ builds:
 
     hooks:
       pre: go mod tidy
-      post: ./upx.sh
+      post: make compress
 
 archives:
   - id: retry
