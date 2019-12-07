@@ -15,13 +15,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v1
-
       - name: Setup go
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
+
+      - name: Checkout code
+        uses: actions/checkout@v1
 
       - name: Build binary
         run: go build -o dist/retry -ldflags="-s -w -X main.version=$(git describe --tags)" .
@@ -34,22 +34,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
       - name: Checkout code
         uses: actions/checkout@v1
 
       - name: Run tests
-        run: go test -v -race -cover ./...
+        run: make test
 
-  golang-ci-lint:
+  lint:
     name: Lint
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+
       - name: Checkout code
         uses: actions/checkout@v1
 
-      - name: Run GolangCI-Lint
-        uses: docker://golangci/golangci-lint:v1.21.0-alpine
-        with:
-          entrypoint: /usr/bin/golangci-lint
-          args: run -v
+      - name: Lint code
+        run: make lint
