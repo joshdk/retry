@@ -22,7 +22,7 @@ $ sudo install retry /usr/bin/retry
 
 ### From source
 
-Alternatively, a development version of this tool by running:
+Alternatively, a development version of this tool can be installed by running:
 
 ```bash
 $ go get -u github.com/joshdk/retry
