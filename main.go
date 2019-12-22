@@ -19,40 +19,44 @@ import (
 // time with -ldflags.
 var version = "development"
 
+// cmdFlags represents the assorted command line flags that can be passed.
+type cmdFlags struct {
+	retry.Spec
+	quiet   bool
+	version bool
+}
+
 func main() {
-	failed, err := mainCmd()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "retry: %v\n", err)
-	}
-	if failed {
+	var flags cmdFlags
+	flag.IntVar(&flags.Attempts, "attempts", 3, "maximum number of attempts")
+	flag.BoolVar(&flags.Backoff, "backoff", false, "use exponential backoff when sleeping")
+	flag.IntVar(&flags.Consecutive, "consecutive", 0, "required number of back to back successes")
+	flag.DurationVar(&flags.TotalTime, "max-time", time.Minute, "maximum total time")
+	flag.BoolVar(&flags.quiet, "quiet", false, "silence all output")
+	flag.DurationVar(&flags.Sleep, "sleep", 5*time.Second, "time to sleep between attempts")
+	flag.DurationVar(&flags.TaskTime, "task-time", 0, "maximum time for a single attempt")
+	flag.BoolVar(&flags.version, "version", false, fmt.Sprintf("print the version %q and exit", version))
+	flag.Usage = usage
+	flag.Parse()
+
+	if err := mainCmd(flags); err != nil {
+		if !flags.quiet {
+			fmt.Fprintf(os.Stderr, "retry: %v\n", err)
+		}
 		os.Exit(1)
 	}
 }
 
-func mainCmd() (bool, error) {
-	var spec retry.Spec
-	var versionFlag bool
-	var quietFlag bool
-	flag.IntVar(&spec.Attempts, "attempts", 3, "maximum number of attempts")
-	flag.BoolVar(&spec.Backoff, "backoff", false, "use exponential backoff when sleeping")
-	flag.IntVar(&spec.Consecutive, "consecutive", 0, "required number of back to back successes")
-	flag.DurationVar(&spec.TotalTime, "max-time", time.Minute, "maximum total time")
-	flag.BoolVar(&quietFlag, "quiet", false, "silence all output")
-	flag.DurationVar(&spec.Sleep, "sleep", 5*time.Second, "time to sleep between attempts")
-	flag.DurationVar(&spec.TaskTime, "task-time", 0, "maximum time for a single attempt")
-	flag.BoolVar(&versionFlag, "version", false, fmt.Sprintf("print the version %q and exit", version))
-	flag.Usage = usage
-	flag.Parse()
-
+func mainCmd(flags cmdFlags) error {
 	// If the version flag (-version) was given, print the version and exit.
-	if versionFlag {
+	if flags.version {
 		fmt.Println(version)
-		return false, nil
+		return nil
 	}
 
 	// If no arguments were given, there's nothing to do.
 	if flag.NArg() == 0 {
-		return true, errors.New("no command given")
+		return errors.New("no command given")
 	}
 
 	var (
@@ -67,18 +71,10 @@ func mainCmd() (bool, error) {
 		task = retry.HTTPTask{URL: command}
 	} else {
 		// Otherwise, assume the command references a (shell) command.
-		task = retry.ExecTask{Name: command, Args: args, Quiet: quietFlag}
+		task = retry.ExecTask{Name: command, Args: args, Quiet: flags.quiet}
 	}
 
-	err := retry.Retry(spec, task)
-	switch {
-	case err != nil && quietFlag:
-		return true, nil // Intentionally silence error.
-	case err != nil:
-		return true, err
-	default:
-		return false, nil
-	}
+	return retry.Retry(flags.Spec, task)
 }
 
 func usage() {
