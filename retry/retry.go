@@ -36,8 +36,8 @@ type Spec struct {
 	// row in order for the task to be considered successful overall.
 	Consecutive int
 
-	// Jitter is the duration range to randomly add or subtract from the Sleep
-	// time.
+	// Jitter is the duration range to randomly add to the Sleep time.
+	//  Sleep + [0, Jitter)
 	Jitter time.Duration
 
 	// Sleep is the duration to pause between individual task invocations.
@@ -59,9 +59,6 @@ func Retry(spec Spec, task Task) error {
 	ctxBackground := context.Background()
 	ctxMaxTime, cancel := maybeTimed(ctxBackground, spec.TotalTime)
 	defer cancel()
-
-	// rng is a seeded source capable of generating random values.
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var totalRuns int
 	var multiplier int64 = 1
@@ -97,7 +94,7 @@ func Retry(spec Spec, task Task) error {
 			}
 
 			// Sleep for the specified duration.
-			snooze := jitter(rng, spec.Sleep*time.Duration(multiplier), spec.Jitter)
+			snooze := spec.Sleep*time.Duration(multiplier) + jitter(spec.Jitter)
 			if err := contextSleep(ctxMaxTime, snooze); err != nil {
 				return ErrExceededTime
 			}
@@ -125,17 +122,17 @@ func maybeTimed(parent context.Context, timeout time.Duration) (context.Context,
 	return context.WithTimeout(parent, timeout)
 }
 
-// jitter adds or subtracts up to a maximum duration variance from the target
-// duration. Returns a (potentially negative) duration in the range of:
-//   [target - variance, target + variance]
-func jitter(rng *rand.Rand, target, variance time.Duration) time.Duration {
+// jitter returns a random duration in the range of:
+//   [0, variance)
+func jitter(variance time.Duration) time.Duration {
 	if variance <= 0 {
-		return target
+		return 0
 	}
 
-	return time.Duration(
-		int64(target) + rng.Int63n(int64(variance)*2) - int64(variance),
-	)
+	// rng is a seeded source capable of generating random values.
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	return time.Duration(rng.Int63n(int64(variance)))
 }
 
 // contextSleep is a context-aware sleep. It will sleep for the given timeout,

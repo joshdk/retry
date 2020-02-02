@@ -50,21 +50,23 @@ This tool is an attempt to solve that broader problem. ⏰
 $ retry -help
 Usage: retry [flags] command|url
   -attempts int
-    	maximum number of attempts (default 3)
+        maximum number of attempts (default 3)
   -backoff
-    	use exponential backoff when sleeping
+        use exponential backoff when sleeping
   -consecutive int
-    	required number of back to back successes
+        required number of back to back successes
+  -jitter duration
+        time range randomly added to sleep
   -max-time duration
-    	maximum total time (default 1m0s)
+        maximum total time (default 1m0s)
   -quiet
-    	silence all output
+        silence all output
   -sleep duration
-    	time to sleep between attempts (default 5s)
+        time to sleep between attempts (default 5s)
   -task-time duration
-    	maximum time for a single attempt
+        maximum time for a single attempt
   -version
-    	print the version "1.0.0" and exit
+        print the version "1.0.0" and exit
 ```
 
 ### Running a command
@@ -121,6 +123,16 @@ The `-backoff` flag is used with `-sleep`, and will double the time delay betwee
 >
 > ```bash
 > $ retry -sleep=15s -backoff wget https://example.com
+> ```
+
+### Random jitter
+
+The `-jitter` flag adds a random time range to the sleep duration. Jitter added on top of exponential backoff.
+
+> Run `cat kubeconfig.yml`, sleep for 15 seconds minimum, plus a random 0-10 seconds between each run.
+>
+> ```bash
+> $ retry -sleep=15s -jitter=10s cat kubeconfig.yml
 > ```
 
 ### Consecutive successes
