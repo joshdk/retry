@@ -7,6 +7,7 @@ package retry
 import (
 	"context"
 	"errors"
+	"math/rand"
 	"time"
 )
 
@@ -35,6 +36,10 @@ type Spec struct {
 	// row in order for the task to be considered successful overall.
 	Consecutive int
 
+	// Jitter is the duration range to randomly add or subtract from the Sleep
+	// time.
+	Jitter time.Duration
+
 	// Sleep is the duration to pause between individual task invocations.
 	Sleep time.Duration
 
@@ -54,6 +59,9 @@ func Retry(spec Spec, task Task) error {
 	ctxBackground := context.Background()
 	ctxMaxTime, cancel := maybeTimed(ctxBackground, spec.TotalTime)
 	defer cancel()
+
+	// rng is a seeded source capable of generating random values.
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	var totalRuns int
 	var multiplier int64 = 1
@@ -89,7 +97,7 @@ func Retry(spec Spec, task Task) error {
 			}
 
 			// Sleep for the specified duration.
-			snooze := spec.Sleep * time.Duration(multiplier)
+			snooze := jitter(rng, spec.Sleep*time.Duration(multiplier), spec.Jitter)
 			if err := contextSleep(ctxMaxTime, snooze); err != nil {
 				return ErrExceededTime
 			}
@@ -115,6 +123,19 @@ func maybeTimed(parent context.Context, timeout time.Duration) (context.Context,
 		return context.WithCancel(parent)
 	}
 	return context.WithTimeout(parent, timeout)
+}
+
+// jitter adds or subtracts up to a maximum duration variance from the target
+// duration. Returns a (potentially negative) duration in the range of:
+//   [target - variance, target + variance]
+func jitter(rng *rand.Rand, target, variance time.Duration) time.Duration {
+	if variance <= 0 {
+		return target
+	}
+
+	return time.Duration(
+		int64(target) + rng.Int63n(int64(variance)*2) - int64(variance),
+	)
 }
 
 // contextSleep is a context-aware sleep. It will sleep for the given timeout,
