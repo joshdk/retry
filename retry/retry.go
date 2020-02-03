@@ -7,6 +7,7 @@ package retry
 import (
 	"context"
 	"errors"
+	"math/rand"
 	"time"
 )
 
@@ -34,6 +35,10 @@ type Spec struct {
 	// Consecutive is the number of successful task runs that must happen in a
 	// row in order for the task to be considered successful overall.
 	Consecutive int
+
+	// Jitter is the duration range to randomly add to the Sleep time.
+	//  Sleep + [0, Jitter)
+	Jitter time.Duration
 
 	// Sleep is the duration to pause between individual task invocations.
 	Sleep time.Duration
@@ -89,7 +94,7 @@ func Retry(spec Spec, task Task) error {
 			}
 
 			// Sleep for the specified duration.
-			snooze := spec.Sleep * time.Duration(multiplier)
+			snooze := spec.Sleep*time.Duration(multiplier) + jitter(spec.Jitter)
 			if err := contextSleep(ctxMaxTime, snooze); err != nil {
 				return ErrExceededTime
 			}
@@ -115,6 +120,19 @@ func maybeTimed(parent context.Context, timeout time.Duration) (context.Context,
 		return context.WithCancel(parent)
 	}
 	return context.WithTimeout(parent, timeout)
+}
+
+// jitter returns a random duration in the range of:
+//   [0, variance)
+func jitter(variance time.Duration) time.Duration {
+	if variance <= 0 {
+		return 0
+	}
+
+	// rng is a seeded source capable of generating random values.
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	return time.Duration(rng.Int63n(int64(variance)))
 }
 
 // contextSleep is a context-aware sleep. It will sleep for the given timeout,
