@@ -15,7 +15,7 @@
 A prebuilt [release][github-release-link] binary can be downloaded by running:
 
 ```bash
-$ wget -q https://github.com/joshdk/retry/releases/download/v1.0.0/retry-linux-amd64.tar.gz
+$ wget -q https://github.com/joshdk/retry/releases/download/v1.1.0/retry-linux-amd64.tar.gz
 $ tar -xf retry-linux-amd64.tar.gz
 $ sudo install retry /usr/bin/retry
 ```
@@ -47,7 +47,6 @@ This tool is an attempt to solve that broader problem. ⏰
 ### Help!
 
 ```bash
-$ retry -help
 Usage: retry [flags] command|url
   -attempts int
         maximum number of attempts (default 3)
@@ -55,6 +54,8 @@ Usage: retry [flags] command|url
         use exponential backoff when sleeping
   -consecutive int
         required number of back to back successes
+  -invert
+        wait for task to fail rather than succeed
   -jitter duration
         time range randomly added to sleep
   -max-time duration
@@ -66,7 +67,7 @@ Usage: retry [flags] command|url
   -task-time duration
         maximum time for a single attempt
   -version
-        print the version "1.0.0" and exit
+        print the version "1.1.0" and exit
 ```
 
 ### Running a command
