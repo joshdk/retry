@@ -3,6 +3,7 @@ linters:
   disable:
     - gomnd
     - lll
+    - maligned
     - wsl
 
 issues:

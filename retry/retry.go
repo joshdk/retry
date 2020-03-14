@@ -36,6 +36,10 @@ type Spec struct {
 	// row in order for the task to be considered successful overall.
 	Consecutive int
 
+	// Invert is used to indicate that the task success status should be
+	//reversed. Failed tasks count as successful, and vice versa.
+	Invert bool
+
 	// Jitter is the duration range to randomly add to the Sleep time.
 	//  Sleep + [0, Jitter)
 	Jitter time.Duration
@@ -70,7 +74,7 @@ func Retry(spec Spec, task Task) error {
 		case <-ctxMaxTime.Done():
 			return ErrExceededTime
 		case err := <-runnerChan(ctxMaxTask, task):
-			if err != nil {
+			if err != nil != spec.Invert {
 				// Task failed, so drop the number of consecutive successful
 				// runs back down to zero.
 				consecutive = 0
