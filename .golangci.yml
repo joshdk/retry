@@ -1,10 +1,12 @@
 linters:
   enable-all: true
   disable:
+    - gomnd
     - lll
     - wsl
 
 issues:
+  exclude-use-default: true
   exclude:
     # Triggered by table tests calling t.Run. See
     # https://github.com/kyoh86/scopelint/issues/4 for more information.
