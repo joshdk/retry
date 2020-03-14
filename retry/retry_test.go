@@ -46,6 +46,36 @@ func TestRetry(t *testing.T) {
 			duration: 0,
 		},
 		{
+			title: "succeed invert",
+			task:  ExecTask{Name: "false"},
+			spec: Spec{
+				Consecutive: 3,
+				Invert:      true,
+			},
+			results: []result{
+				{elapsed: 0, failed: true},
+				{elapsed: 0, failed: true},
+				{elapsed: 0, failed: true},
+			},
+			failed:   false,
+			duration: 0,
+		},
+		{
+			title: "fail invert",
+			task:  ExecTask{Name: "true"},
+			spec: Spec{
+				Attempts: 3,
+				Invert:   true,
+			},
+			results: []result{
+				{elapsed: 0, failed: false},
+				{elapsed: 0, failed: false},
+				{elapsed: 0, failed: false},
+			},
+			failed:   true,
+			duration: 0,
+		},
+		{
 			title: "succeed slow with task time",
 			task:  ExecTask{Name: "sleep", Args: []string{"2"}},
 			spec: Spec{

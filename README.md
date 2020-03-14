@@ -125,6 +125,16 @@ The `-backoff` flag is used with `-sleep`, and will double the time delay betwee
 > $ retry -sleep=15s -backoff wget https://example.com
 > ```
 
+### Invert status
+
+The `-invert` flag is used to flip a task's failure status. Successful task runs will become failures, and vice versa. Useful for when you want to retry a command until it fails.
+
+> Run `curl https://example.com/health`, a maximum of 20 times, until it becomes unresponsive.
+>
+> ```bash
+> $ retry -attempts=20 -invert curl https://example.com/health
+> ```
+
 ### Random jitter
 
 The `-jitter` flag adds a random time range to the sleep duration. Jitter added on top of exponential backoff.
