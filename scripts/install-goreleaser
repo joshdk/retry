@@ -9,7 +9,7 @@ elif [ "$platform" = Darwin ]; then
 fi
 
 cd "$(mktemp -d)" || exit 1
-wget -q "https://github.com/goreleaser/goreleaser/releases/download/v0.123.3/${prefix}.tar.gz"
+wget -q "https://github.com/goreleaser/goreleaser/releases/download/v0.145.0/${prefix}.tar.gz"
 tar -xf "${prefix}.tar.gz"
 mkdir -p "$(dirname "$1")"
 install goreleaser "$1"

@@ -16,12 +16,12 @@ jobs:
 
     steps:
       - name: Setup go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.13
+          go-version: 1.15
 
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Build binary
         run: go build -o dist/retry -ldflags="-s -w -X main.version=$(git describe --tags)" .
@@ -35,12 +35,12 @@ jobs:
 
     steps:
       - name: Setup go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.13
+          go-version: 1.15
 
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Run tests
         run: make test
@@ -51,12 +51,12 @@ jobs:
 
     steps:
       - name: Setup go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
-          go-version: 1.13
+          go-version: 1.15
 
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Lint code
         run: make lint

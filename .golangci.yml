@@ -1,9 +1,16 @@
 linters:
   enable-all: true
   disable:
+    - exhaustivestruct
+    - goerr113
     - gomnd
+    - gosec
     - lll
     - maligned
+    - nlreturn
+    - testpackage
+    - tparallel
+    - wrapcheck
     - wsl
 
 issues:

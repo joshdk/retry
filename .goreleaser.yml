@@ -13,6 +13,13 @@ builds:
       - amd64
       - 386
 
+    ignore:
+      - goos: darwin
+        goarch: 386
+
+    flags:
+      - -trimpath
+
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
@@ -22,7 +29,8 @@ builds:
 
     hooks:
       pre: go mod tidy
-      post: make compress
+      post:
+        - upx --best --ultra-brute "{{ .Path }}"
 
 archives:
   - id: retry

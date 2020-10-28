@@ -37,11 +37,11 @@ type Spec struct {
 	Consecutive int
 
 	// Invert is used to indicate that the task success status should be
-	//reversed. Failed tasks count as successful, and vice versa.
+	// reversed. Failed tasks count as successful, and vice versa.
 	Invert bool
 
 	// Jitter is the duration range to randomly add to the Sleep time.
-	//  Sleep + [0, Jitter)
+	// Sleep + [0, Jitter)
 	Jitter time.Duration
 
 	// Sleep is the duration to pause between individual task invocations.
