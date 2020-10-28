@@ -67,10 +67,6 @@ test: $(go-junit-report)
 
 #### Release ####
 
-.PHONY: compress
-compress: $(upx)
-	$(upx) --best --ultra-brute dist/retry_*/retry*
-
 .PHONY: release
 release: $(goreleaser)
 ifdef GITHUB_ACTIONS
