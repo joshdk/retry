@@ -252,12 +252,13 @@ func checkError(t *testing.T, failureExpected bool, actual error) {
 }
 
 func checkDuration(t *testing.T, expected time.Duration, actual time.Duration) {
+	t.Helper()
+
 	// epsilon is the time duration delta that is allowed when comparing times.
 	// Higher epsilon values result in longer time margins. Lower epsilon
 	// values result in smaller time margins, but potentially flaky tests.
 	epsilon := time.Millisecond * 500
 
-	t.Helper()
 	if actual < expected-epsilon || expected+epsilon < actual {
 		assert.Failf(t, "duration mismatch", "A duration of %v ± %v is expected but got %v", expected, epsilon, actual)
 	}
