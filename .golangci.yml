@@ -2,12 +2,14 @@ linters:
   enable-all: true
   disable:
     - exhaustivestruct
+    - forbidigo
     - goerr113
     - gomnd
     - gosec
     - lll
     - maligned
     - nlreturn
+    - paralleltest
     - testpackage
     - tparallel
     - wrapcheck
