@@ -15,7 +15,7 @@
 A prebuilt [release][github-release-link] binary can be downloaded by running:
 
 ```bash
-$ wget -q https://github.com/joshdk/retry/releases/download/v1.1.0/retry-linux-amd64.tar.gz
+$ wget -q https://github.com/joshdk/retry/releases/download/v1.2.0/retry-linux-amd64.tar.gz
 $ tar -xf retry-linux-amd64.tar.gz
 $ sudo install retry /usr/bin/retry
 ```
@@ -67,7 +67,7 @@ Usage: retry [flags] command|url
   -task-time duration
         maximum time for a single attempt
   -version
-        print the version "1.1.0" and exit
+        print the version "1.2.0" and exit
 ```
 
 ### Running a command
@@ -184,8 +184,8 @@ This code is distributed under the [MIT License][license-link], see [LICENSE.txt
 [github-release-link]:   https://github.com/joshdk/retry/releases
 [go-report-card-badge]:  https://goreportcard.com/badge/github.com/joshdk/retry
 [go-report-card-link]:   https://goreportcard.com/report/github.com/joshdk/retry
-[godoc-badge]:           https://godoc.org/github.com/joshdk/retry/retry?status.svg
-[godoc-link]:            https://godoc.org/github.com/joshdk/retry/retry
+[godoc-badge]:           https://pkg.go.dev/badge/github.com/joshdk/retry/retry
+[godoc-link]:            https://pkg.go.dev/github.com/joshdk/retry/retry
 [license-badge]:         https://img.shields.io/badge/license-MIT-green.svg
 [license-file]:          https://github.com/joshdk/retry/blob/master/LICENSE.txt
 [license-link]:          https://opensource.org/licenses/MIT
