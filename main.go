@@ -31,6 +31,7 @@ func main() {
 	flag.IntVar(&flags.Attempts, "attempts", 3, "maximum number of attempts")
 	flag.BoolVar(&flags.Backoff, "backoff", false, "use exponential backoff when sleeping")
 	flag.IntVar(&flags.Consecutive, "consecutive", 0, "required number of back to back successes")
+	flag.DurationVar(&flags.InitialDelay, "delay", 0, "initial delay period before tasks are run")
 	flag.BoolVar(&flags.Invert, "invert", false, "wait for task to fail rather than succeed")
 	flag.DurationVar(&flags.Jitter, "jitter", 0, "time range randomly added to sleep")
 	flag.DurationVar(&flags.TotalTime, "max-time", time.Minute, "maximum total time")

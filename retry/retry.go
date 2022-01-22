@@ -36,6 +36,10 @@ type Spec struct {
 	// row in order for the task to be considered successful overall.
 	Consecutive int
 
+	// InitialDelay is the duration to pause before initially starting task
+	// invocations.
+	InitialDelay time.Duration
+
 	// Invert is used to indicate that the task success status should be
 	// reversed. Failed tasks count as successful, and vice versa.
 	Invert bool
@@ -63,6 +67,12 @@ func Retry(spec Spec, task Task) error {
 	ctxBackground := context.Background()
 	ctxMaxTime, cancel := maybeTimed(ctxBackground, spec.TotalTime)
 	defer cancel()
+
+	// Sleep for the amount of time specified by the initial delay, but not
+	// more than the max time.
+	if err := contextSleep(ctxMaxTime, spec.InitialDelay); err != nil {
+		return ErrExceededTime
+	}
 
 	var totalRuns int
 	var multiplier int64 = 1
