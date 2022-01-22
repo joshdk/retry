@@ -170,6 +170,17 @@ func TestRetry(t *testing.T) {
 			duration: 12 * time.Second,
 		},
 		{
+			title: "succeed initial delay",
+			task:  ExecTask{Name: "sleep", Args: []string{"5"}},
+			spec: Spec{
+				InitialDelay: 5 * time.Second,
+			},
+			results: []result{
+				{elapsed: 5 * time.Second},
+			},
+			duration: 10 * time.Second,
+		},
+		{
 			title: "http url",
 			task:  HTTPTask{"http://www.google.com"},
 			spec: Spec{
