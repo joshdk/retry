@@ -49,3 +49,29 @@ checksum:
 
 changelog:
   skip: true
+
+brews:
+  - name: retry
+    ids: [retry]
+
+    tap:
+      owner: joshdk
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_GITHUB_TOKEN }}"
+
+    url_template: "https://github.com/joshdk/retry/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+
+    commit_msg_template: "feat: brew formula update for {{ .ProjectName }} {{ .Tag }}"
+    commit_author:
+      name: joshdk
+      email: jdkomo@gmail.com
+
+    folder: Formula
+
+    caveats: "Run retry --help for usage"
+    homepage: "https://github.com/joshdk/retry"
+    description: "Rerun a command until it eventually succeeds, or doesn't"
+    license: "MIT"
+
+    test: |
+      system "#{bin}/retry -version"
