@@ -8,24 +8,27 @@
 
 ⏰ Rerun a command until it eventually succeeds, or doesn't!
 
-## Installing
+## Installation
 
-### Release binary
+Prebuilt binaries for several architectures can be found attached to any of the available [releases][github-release-link].
 
-A prebuilt [release][github-release-link] binary can be downloaded by running:
-
-```bash
-$ wget -q https://github.com/joshdk/retry/releases/download/v1.2.0/retry-linux-amd64.tar.gz
-$ tar -xf retry-linux-amd64.tar.gz
-$ sudo install retry /usr/bin/retry
+For Linux:
+```shell
+wget https://github.com/joshdk/retry/releases/download/v1.3.0/retry-linux-amd64.tar.gz
+tar -xf retry-linux-amd64.tar.gz
+sudo install retry /usr/bin/retry
 ```
 
-### From source
+For Mac:
+```shell
+brew tap joshdk/tap
+brew install joshdk/tap/retry
+```
 
-Alternatively, a development version of this tool can be installed by running:
-
-```bash
-$ go get -u github.com/joshdk/retry
+A development version can also be built directly from this repository.
+Requires that you already have a functional Go toolchain installed.
+```shell
+go install github.com/joshdk/retry@master
 ```
 
 ## Motivations
@@ -54,6 +57,8 @@ Usage: retry [flags] command|url
         use exponential backoff when sleeping
   -consecutive int
         required number of back to back successes
+  -delay duration
+        initial delay period before tasks are run
   -invert
         wait for task to fail rather than succeed
   -jitter duration
@@ -67,7 +72,7 @@ Usage: retry [flags] command|url
   -task-time duration
         maximum time for a single attempt
   -version
-        print the version "1.2.0" and exit
+        print the version "1.3.0" and exit
 ```
 
 ### Running a command
@@ -104,6 +109,16 @@ The `-max-time` flag limits the maximum total time that `retry` will run for. A 
 >
 > ```bash
 > $ retry -max-time=60s https://example.com
+> ```
+
+### Initial delay
+
+The `-delay` flag inserts a one-time delay before initial starting to run commands.
+
+> Run `wget https://example.com`, but start only after initially sleeping for 15 seconds.
+>
+> ```bash
+> $ retry -delay=15s wget https://example.com
 > ```
 
 ### Sleep between attempts
@@ -168,10 +183,10 @@ Lastly, the `-quiet` flag silences all output (STDOUT and STDERR) from the comma
 
 ### Altogether now
 
-> Run `wget https://example.com` a maximum of **10** times. Each run can take a maximum of **15 seconds**, and a total of **2 minutes**. Sleep for **5 seconds** between failures with exponential **backoff**. Lastly, require that the command succeeds **3 times** in a row.
+> Run `wget https://example.com` a maximum of **10** times. Each run can take a maximum of **15 seconds**, and a total of **2 minutes**. Delay for **15 seconds** before starting. Sleep for **5 seconds** between failures with exponential **backoff**. Lastly, require that the command succeeds **3 times** in a row.
 >
 > ```bash
-> $ retry -attempts=10 -task-time=15s -max-time=2m -sleep=5s -backoff -consecutive=3 wget https://example.com
+> $ retry -attempts=10 -task-time=15s -max-time=2m -delay=15s -sleep=5s -backoff -consecutive=3 wget https://example.com
 >```
 
 ## License
