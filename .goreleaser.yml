@@ -22,15 +22,14 @@ builds:
 
     ldflags:
       - -s -w
+      - -buildid=
       - -X main.version={{.Version}}
 
     env:
       - CGO_ENABLED=0
 
     hooks:
-      pre: go mod tidy
-      post:
-        - upx --best --ultra-brute "{{ .Path }}"
+      post: upx --best --ultra-brute "{{ .Path }}"
 
 archives:
   - id: retry
@@ -42,7 +41,7 @@ archives:
         format: zip
 
 release:
-  name_template: "{{.Version}} Release"
+  name_template: "{{.Tag}} Release"
   prerelease: auto
 
 checksum:
