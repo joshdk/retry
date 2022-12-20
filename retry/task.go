@@ -41,7 +41,7 @@ type HTTPTask struct {
 }
 
 func (t HTTPTask) Run(ctx context.Context) error {
-	request, err := http.NewRequest("GET", t.URL, nil)
+	request, err := http.NewRequest(http.MethodGet, t.URL, nil)
 	if err != nil {
 		return err
 	}

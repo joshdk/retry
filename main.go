@@ -53,7 +53,7 @@ func main() {
 func mainCmd(flags cmdFlags) error {
 	// If the version flag (-version) was given, print the version and exit.
 	if flags.version {
-		fmt.Println(version)
+		fmt.Println(version) //nolint:forbidigo
 		return nil
 	}
 
