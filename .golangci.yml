@@ -1,26 +1,38 @@
+issues:
+  exclude-use-default: true
+  exclude:
+    # Triggered by long table tests.
+    - Function 'Test\w+' is too long
+
 linters:
   enable-all: true
   disable:
-    - cyclop
+    # Linters that are deprecated.
     - exhaustivestruct
-    - forbidigo
+    - scopelint
+    - interfacer
+    - maligned
+    - golint
+    - ifshort
+    - structcheck
+    - nosnakecase
+    - deadcode
+    - varcheck
+
+    # Linters that are disabled because of generics.
+    - rowserrcheck
+    - sqlclosecheck
+    - wastedassign
+
+    # Linters that are not used for this project.
+    - cyclop
+    - exhaustruct
     - goerr113
     - gomnd
     - gosec
-    - lll
-    - maligned
     - nlreturn
     - paralleltest
     - testpackage
     - tparallel
     - wrapcheck
     - wsl
-
-issues:
-  exclude-use-default: true
-  exclude:
-    # Triggered by table tests calling t.Run. See
-    # https://github.com/kyoh86/scopelint/issues/4 for more information.
-    - Using the variable on range scope `test` in function literal
-    # Triggered by long table tests.
-    - Function 'Test\w+' is too long

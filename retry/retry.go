@@ -137,7 +137,8 @@ func maybeTimed(parent context.Context, timeout time.Duration) (context.Context,
 }
 
 // jitter returns a random duration in the range of:
-//   [0, variance)
+//
+//	[0, variance)
 func jitter(variance time.Duration) time.Duration {
 	if variance <= 0 {
 		return 0
