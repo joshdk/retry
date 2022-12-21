@@ -6,8 +6,6 @@ on:
   push:
     branches:
       - "master"
-    tags:
-      - "!*"
 
 jobs:
   build:
@@ -44,22 +42,3 @@ jobs:
 
       - name: Run tests
         run: go test -v -race -cover ./...
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Setup go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.19
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2
-        with:
-          # https://github.com/golangci/golangci-lint/releases/tag/v1.50.1
-          version: v1.50.1
