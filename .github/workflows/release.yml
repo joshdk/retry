@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Setup go
@@ -19,14 +19,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Setup upx
-        run: |-
-          cd "$(mktemp -d)"
-          wget -q https://github.com/upx/upx/releases/download/v3.96/upx-3.96-amd64_linux.tar.xz
-          tar -xf upx-3.96-amd64_linux.tar.xz
-          sudo install upx-3.96-amd64_linux/upx /usr/bin/upx
-          rm -rf "$PWD"
 
       - name: Build and publish release artifacts
         uses: goreleaser/goreleaser-action@v2
