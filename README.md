@@ -14,7 +14,7 @@ Prebuilt binaries for several architectures can be found attached to any of the 
 
 For Linux:
 ```shell
-wget https://github.com/joshdk/retry/releases/download/v1.3.0/retry-linux-amd64.tar.gz
+wget https://github.com/joshdk/retry/releases/download/v1.4.0/retry-linux-amd64.tar.gz
 tar -xf retry-linux-amd64.tar.gz
 sudo install retry /usr/bin/retry
 ```
@@ -72,7 +72,7 @@ Usage: retry [flags] command|url
   -task-time duration
         maximum time for a single attempt
   -version
-        print the version "1.3.0" and exit
+        print the version "v1.4.0" and exit
 ```
 
 ### Running a command
